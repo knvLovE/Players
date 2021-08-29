@@ -9,7 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.xml.ws.Action;
 import java.util.List;
@@ -34,6 +36,12 @@ public class PlayerDaoImpl implements PlayerDao{
         return page.getTotalElements();
     }
 
+    @Override
+    public Player getPlayerById(Long id) {
+        return playerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "player not found with id: " + id));
+    }
 
     Page<Player> readPlayersInfoByFilter (PlayerRequestDto playerRequestDto) {
 

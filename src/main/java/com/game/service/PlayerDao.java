@@ -8,4 +8,5 @@ import java.util.List;
 public interface PlayerDao {
     List<Player> getPlayersByFilter(PlayerRequestDto playerRequestDto);
     Long getPlayersCountByFilter(PlayerRequestDto playerRequestDto);
+    Player getPlayerById(Long id);
 }

@@ -1,7 +1,11 @@
-### с дефолтными параметрами
+### получить страницу с дефолтными параметрами
 GET http://localhost:8080/rest/players
 Accept: application/json
 
-### получить страницу с сортировкой
+### получить страницу с сортировкой и фильтром
 GET http://localhost:8080/rest/players?pageNumber=0&pageSize=5&order=NAME&name=а
+Accept: application/json
+
+### получить игрока по id
+GET http://localhost:8080/rest/players/41
 Accept: application/json

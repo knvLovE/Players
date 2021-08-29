@@ -7,10 +7,7 @@ import com.game.entity.Profession;
 import com.game.entity.Race;
 import com.game.service.PlayerDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
@@ -65,6 +62,12 @@ public class UserRestController {
                 minExperience, maxExperience, minLevel, maxLevel, order, pageNumber, pageSize);
 
         return playerDao.getPlayersCountByFilter(playerRequestDto);
+    }
+
+    @GetMapping("/players/{id}")
+    public Player getPlayer (
+            @PathVariable(required = true, name = "id") Long id) {
+        return playerDao.getPlayerById(id);
     }
 
     PlayerDao playerDao;

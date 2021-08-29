@@ -18,17 +18,6 @@ import java.util.List;
 @Service
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
-
-    List<Player> findByNameContaining (String name, Pageable pageable);
-    List<Player> findByTitle (String title, Pageable pageable);
-    List<Player> findByRace (Race race, Pageable pageable);
-    List<Player> findByProfession (Profession profession, Pageable pageable);
-    List<Player> findByBirthdayBetween (Date before, Date after, Pageable pageable);
-    List<Player> findByBanned (Boolean banned, Pageable pageable);
-    List<Player> findByExperienceBetween (Integer minExperience, Integer maxExperience, Pageable pageable);
-    List<Player> findByLevelBetween (Integer minLevel, Integer maxLevel, Pageable pageable);
-
-
     @Query ("select u from Player u where" +
             "    (:name IS NULL OR u.name LIKE %:name%)" +
             "AND (:title IS NULL OR u.title LIKE %:title%)" +
