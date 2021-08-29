@@ -1,0 +1,7 @@
+### с дефолтными параметрами
+GET http://localhost:8080/rest/players
+Accept: application/json
+
+### получить страницу с сортировкой
+GET http://localhost:8080/rest/players?pageNumber=0&pageSize=5&order=NAME&name=а
+Accept: application/json
