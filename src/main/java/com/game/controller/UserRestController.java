@@ -1,6 +1,7 @@
 package com.game.controller;
 
 
+import com.game.dto.PlayerCreateRequestDto;
 import com.game.dto.PlayerRequestDto;
 import com.game.entity.Player;
 import com.game.entity.Profession;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -68,6 +70,13 @@ public class UserRestController {
     public Player getPlayer (
             @PathVariable(required = true, name = "id") Long id) {
         return playerDao.getPlayerById(id);
+    }
+
+    @PostMapping("/players")
+    public Player getPlayer (
+            @RequestBody PlayerCreateRequestDto playerCreateRequestDto
+    ) {
+        return playerDao.createPlayer(playerCreateRequestDto);
     }
 
     PlayerDao playerDao;
