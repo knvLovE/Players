@@ -10,5 +10,6 @@ public interface PlayerDao {
     List<Player> getPlayersByFilter(PlayerRequestDto playerRequestDto);
     Long getPlayersCountByFilter(PlayerRequestDto playerRequestDto);
     Player getPlayerById(Long id);
+    void deletePlayerById(Long id);
     Player createPlayer(PlayerCreateRequestDto playerCreateRequestDto);
 }

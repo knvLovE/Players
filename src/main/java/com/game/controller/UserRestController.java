@@ -79,6 +79,12 @@ public class UserRestController {
         return playerDao.createPlayer(playerCreateRequestDto);
     }
 
+    @DeleteMapping("/players/{id}")
+    public void deletePlayer (
+            @PathVariable(required = true, name = "id") Long id) {
+         playerDao.deletePlayerById(id);
+    }
+
     PlayerDao playerDao;
 
     @Autowired

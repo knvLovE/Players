@@ -44,4 +44,6 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             @Param("maxLevel") Integer maxLevel,
             @Param("pageable") Pageable pageable
     );
+
+    void deleteById (Long id);
 }

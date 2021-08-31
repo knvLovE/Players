@@ -6,6 +6,7 @@ import com.game.dto.PlayerRequestDto;
 import com.game.entity.Player;
 import com.game.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,17 +32,26 @@ public class PlayerDaoImpl implements PlayerDao{
 
     @Override
     public Long getPlayersCountByFilter(PlayerRequestDto playerRequestDto) {
-
         Page page = readPlayersInfoByFilter(playerRequestDto);
         return page.getTotalElements();
     }
 
     @Override
     public Player getPlayerById(Long id) {
-        if (id < 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id должен быть больше нуля");
+        if (id <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id должен быть больше нуля");
         return playerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "player not found with id: " + id));
+    }
+
+    @Override
+    public void deletePlayerById(Long id) {
+        if (id <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id должен быть больше нуля");
+        try {
+            playerRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
@@ -115,9 +125,9 @@ public class PlayerDaoImpl implements PlayerDao{
         if (StringUtils.isEmpty(requestDto.getName())) errorMessage = "Имя должно быть не пустым";
         if (requestDto.getName().length() > NAME_LENGTH_MAX) errorMessage = "длина имени должна быть меньше " + NAME_LENGTH_MAX;
         if (requestDto.getTitle().length() > TITLE_LENGTH_MAX) errorMessage = "длина title должна быть меньше " + TITLE_LENGTH_MAX;
-        if (requestDto.getExperience() < 0 && requestDto.getExperience() > EXPERIENCE_MAX) errorMessage = "Experience выход за границы";
-        if (requestDto.getBirthday().getYear() >= BIRTHDAY_YEAR_MIN
-                && requestDto.getBirthday().getYear() <= DEFAULT_YEAR_MAX) errorMessage = "birthday выход за границы";
+        if (requestDto.getExperience() < 0 || requestDto.getExperience() > EXPERIENCE_MAX) errorMessage = "Experience выход за границы";
+        if (requestDto.getBirthday().getYear() + 1900 < BIRTHDAY_YEAR_MIN
+                || requestDto.getBirthday().getYear() + 1900 > DEFAULT_YEAR_MAX) errorMessage = "birthday выход за границы";
         if (! StringUtils.isEmpty(errorMessage)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
