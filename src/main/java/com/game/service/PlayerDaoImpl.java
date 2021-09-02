@@ -3,6 +3,7 @@ package com.game.service;
 import com.game.controller.PlayerOrder;
 import com.game.dto.PlayerCreateRequestDto;
 import com.game.dto.PlayerRequestDto;
+import com.game.dto.PlayerUpdateRequestDto;
 import com.game.entity.Player;
 import com.game.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.xml.ws.Action;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlayerDaoImpl implements PlayerDao{
@@ -54,6 +55,8 @@ public class PlayerDaoImpl implements PlayerDao{
         }
     }
 
+
+
     @Override
     public Player createPlayer(PlayerCreateRequestDto playerCreateRequestDto) {
 
@@ -74,6 +77,25 @@ public class PlayerDaoImpl implements PlayerDao{
         player.setBanned(playerCreateRequestDto.getBanned());
 
         return playerRepository.saveAndFlush(player);
+    }
+
+    @Override
+    public Player update(PlayerUpdateRequestDto playerUpdate) {
+        if (playerUpdate.getId() <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id должен быть больше нуля");
+
+        int count = playerRepository.updateById(
+                    playerUpdate.getId(),
+                    playerUpdate.getName(),
+                    playerUpdate.getTitle(),
+                    playerUpdate.getRace() != null ? playerUpdate.getRace().name() : null,
+                    playerUpdate.getProfession() != null ? playerUpdate.getProfession().name() : null,
+                    playerUpdate.getBirthday(),
+                    playerUpdate.getBanned(),
+                    playerUpdate.getExperience()
+        );
+        if (count != 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        } else return getPlayerById(playerUpdate.getId());
     }
 
     protected Page<Player> readPlayersInfoByFilter (PlayerRequestDto playerRequestDto) {

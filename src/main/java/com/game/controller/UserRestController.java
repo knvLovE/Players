@@ -3,6 +3,7 @@ package com.game.controller;
 
 import com.game.dto.PlayerCreateRequestDto;
 import com.game.dto.PlayerRequestDto;
+import com.game.dto.PlayerUpdateRequestDto;
 import com.game.entity.Player;
 import com.game.entity.Profession;
 import com.game.entity.Race;
@@ -73,9 +74,8 @@ public class UserRestController {
     }
 
     @PostMapping("/players")
-    public Player getPlayer (
-            @RequestBody PlayerCreateRequestDto playerCreateRequestDto
-    ) {
+    public Player createPlayer (
+            @RequestBody PlayerCreateRequestDto playerCreateRequestDto) {
         return playerDao.createPlayer(playerCreateRequestDto);
     }
 
@@ -83,6 +83,14 @@ public class UserRestController {
     public void deletePlayer (
             @PathVariable(required = true, name = "id") Long id) {
          playerDao.deletePlayerById(id);
+    }
+
+    @PostMapping("/players/{id}")
+    public Player updatePlayer (
+            @PathVariable (name = "id") Long id,
+            @RequestBody PlayerUpdateRequestDto playerUpdate) {
+        playerUpdate.setId(id);
+        return playerDao.update(playerUpdate);
     }
 
     PlayerDao playerDao;

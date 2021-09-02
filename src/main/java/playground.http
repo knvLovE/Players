@@ -23,3 +23,12 @@ Content-Type: application/json;charset=UTF-8
   "birthday": 1630434625096,
   "experience": 100
 }
+
+### Обновить игрока
+POST http://localhost:8080/rest/players/2
+Accept: application/json
+Content-Type: application/json;charset=UTF-8
+
+{
+  "race" : "HUMAN"
+}

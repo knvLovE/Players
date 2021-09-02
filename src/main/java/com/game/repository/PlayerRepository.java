@@ -6,14 +6,17 @@ import com.game.entity.Race;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface PlayerRepository extends JpaRepository<Player, Long> {
@@ -46,4 +49,26 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     );
 
     void deleteById (Long id);
+
+    @Modifying(flushAutomatically = true)
+    @Query ("update Player u set " +
+            "u.name = coalesce (:name, u.name) , " +
+            "u.title = coalesce (:title, u.title), " +
+            "u.race = coalesce (:race, u.race), " +
+            "u.profession = coalesce (:profession, u.profession), " +
+            "u.birthday = coalesce (:birthday, u.birthday), " +
+            "u.banned = coalesce (:banned, u.banned), " +
+            "u.experience = coalesce (:experience, u.experience) " +
+            "where u.id = :id ")
+    @Transactional
+    int updateById (
+            @Param("id") Long id,
+            @Param("name") String name,
+            @Param("title") String title,
+            @Param("race")  String race,
+            @Param("profession") String profession,
+            @Param("birthday") Date birthday,
+            @Param("banned") Boolean banned,
+            @Param("experience") Integer experience
+            );
 }
