@@ -26,8 +26,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             "AND (:title IS NULL OR u.title LIKE %:title%)" +
             "AND (:race IS NULL OR u.race = :race)" +
             "AND (:profession IS NULL OR u.profession = :profession)" +
-            "AND (:before IS NULL OR u.birthday >= :before)" +
-            "AND (:after IS NULL OR u.birthday <= :after)" +
+            "AND (:before IS NULL OR u.birthday <= :before)" +
+            "AND (:after IS NULL OR u.birthday >= :after)" +
             "AND (:banned IS NULL OR u.banned = :banned)" +
             "AND (:minExperience IS NULL OR u.experience >= :minExperience)" +
             "AND (:maxExperience IS NULL OR u.experience <= :maxExperience)" +
@@ -38,8 +38,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             @Param("title") String title,
             @Param("race")  Race race,
             @Param("profession") Profession profession,
-            @Param("before") Long before,
-            @Param("after") Long after,
+            @Param("before") Date before,
+            @Param("after") Date after,
             @Param("banned") Boolean banned,
             @Param("minExperience") Integer minExperience,
             @Param("maxExperience") Integer maxExperience,
@@ -58,7 +58,9 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             "u.profession = coalesce (:profession, u.profession), " +
             "u.birthday = coalesce (:birthday, u.birthday), " +
             "u.banned = coalesce (:banned, u.banned), " +
-            "u.experience = coalesce (:experience, u.experience) " +
+            "u.experience = coalesce (:experience, u.experience), " +
+            "u.level = coalesce (:level, u.level), " +
+            "u.untilNextLevel = coalesce (:untilNextLevel, u.untilNextLevel) " +
             "where u.id = :id ")
     @Transactional
     int updateById (
@@ -69,6 +71,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             @Param("profession") String profession,
             @Param("birthday") Date birthday,
             @Param("banned") Boolean banned,
-            @Param("experience") Integer experience
+            @Param("experience") Integer experience,
+            @Param("level") Integer level,
+            @Param("untilNextLevel") Integer untilNextLevel
             );
 }

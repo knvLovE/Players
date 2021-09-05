@@ -4,13 +4,15 @@ import com.game.controller.PlayerOrder;
 import com.game.entity.Profession;
 import com.game.entity.Race;
 
+import java.util.Date;
+
 public class PlayerRequestDto {
     private String name;
     private String title;
     private Race race;
     private Profession profession;
-    private Long after;
-    private Long before;
+    private Date after;
+    private Date before;
     private Boolean banned;
     private Integer minExperience;
     private Integer maxExperience;
@@ -20,7 +22,7 @@ public class PlayerRequestDto {
     private Integer pageNumber;
     private Integer pageSize;
 
-    public PlayerRequestDto(String name, String title, Race race, Profession profession, Long after, Long before, Boolean banned, Integer minExperience, Integer maxExperience, Integer minLevel, Integer maxLevel, PlayerOrder order, Integer pageNumber, Integer pageSize) {
+    public PlayerRequestDto(String name, String title, Race race, Profession profession, Date after, Date before, Boolean banned, Integer minExperience, Integer maxExperience, Integer minLevel, Integer maxLevel, PlayerOrder order, Integer pageNumber, Integer pageSize) {
         this.name = name;
         this.title = title;
         this.race = race;
@@ -69,19 +71,19 @@ public class PlayerRequestDto {
         this.profession = profession;
     }
 
-    public Long getAfter() {
+    public Date getAfter() {
         return after;
     }
 
-    public void setAfter(Long after) {
+    public void setAfter(Date after) {
         this.after = after;
     }
 
-    public Long getBefore() {
+    public Date getBefore() {
         return before;
     }
 
-    public void setBefore(Long before) {
+    public void setBefore(Date before) {
         this.before = before;
     }
 

@@ -1,6 +1,7 @@
 package com.game.service;
 
 import com.game.controller.PlayerOrder;
+import com.game.dto.PlayerCreateAbstractRequestDto;
 import com.game.dto.PlayerCreateRequestDto;
 import com.game.dto.PlayerRequestDto;
 import com.game.dto.PlayerUpdateRequestDto;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,9 +71,9 @@ public class PlayerDaoImpl implements PlayerDao{
         player.setRace(playerCreateRequestDto.getRace());
         player.setProfession(playerCreateRequestDto.getProfession());
         player.setExperience(playerCreateRequestDto.getExperience());
-        int level =  (int) (Math.sqrt(playerCreateRequestDto.getExperience() * 200 + 2500) - 50) / 100;
+        Integer level =  calcLevel(playerCreateRequestDto.getExperience());
         player.setLevel(level);
-        int untilNextLevel = 50 * (level + 1) * (level + 2) - playerCreateRequestDto.getExperience();
+        Integer untilNextLevel = calcNextLevel (playerCreateRequestDto.getExperience(), level);
         player.setUntilNextLevel(untilNextLevel);
         player.setBirthday(playerCreateRequestDto.getBirthday());
         player.setBanned(playerCreateRequestDto.getBanned());
@@ -79,10 +81,20 @@ public class PlayerDaoImpl implements PlayerDao{
         return playerRepository.saveAndFlush(player);
     }
 
+    protected Integer calcLevel (Integer experience) {
+        return (int) (Math.sqrt(experience * 200 + 2500) - 50) / 100;
+    }
+
+    protected Integer calcNextLevel (Integer experience, Integer level) {
+        return 50 * (level + 1) * (level + 2) - experience;
+    }
+
     @Override
     public Player update(PlayerUpdateRequestDto playerUpdate) {
         if (playerUpdate.getId() <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id должен быть больше нуля");
 
+
+        checkRequestBeforeSave(playerUpdate);
         int count = playerRepository.updateById(
                     playerUpdate.getId(),
                     playerUpdate.getName(),
@@ -91,7 +103,9 @@ public class PlayerDaoImpl implements PlayerDao{
                     playerUpdate.getProfession() != null ? playerUpdate.getProfession().name() : null,
                     playerUpdate.getBirthday(),
                     playerUpdate.getBanned(),
-                    playerUpdate.getExperience()
+                    playerUpdate.getExperience(),
+                playerUpdate.getExperience() != null ? calcLevel(playerUpdate.getExperience()) : null,
+                playerUpdate.getExperience() != null ? calcNextLevel(playerUpdate.getExperience(), calcLevel(playerUpdate.getExperience())) : null
         );
         if (count != 1) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -142,19 +156,35 @@ public class PlayerDaoImpl implements PlayerDao{
     static final int BIRTHDAY_YEAR_MIN = 2000;
     static final int DEFAULT_YEAR_MAX = 3000;
 
-    protected void checkRequestBeforeSave(PlayerCreateRequestDto requestDto) {
+    protected void checkRequestBeforeSave(PlayerCreateAbstractRequestDto requestDto) {
         String errorMessage = null;
-        if (StringUtils.isEmpty(requestDto.getName())) errorMessage = "Имя должно быть не пустым";
-        if (requestDto.getName().length() > NAME_LENGTH_MAX) errorMessage = "длина имени должна быть меньше " + NAME_LENGTH_MAX;
-        if (requestDto.getTitle().length() > TITLE_LENGTH_MAX) errorMessage = "длина title должна быть меньше " + TITLE_LENGTH_MAX;
-        if (requestDto.getExperience() < 0 || requestDto.getExperience() > EXPERIENCE_MAX) errorMessage = "Experience выход за границы";
-        if (requestDto.getBirthday().getYear() + 1900 < BIRTHDAY_YEAR_MIN
-                || requestDto.getBirthday().getYear() + 1900 > DEFAULT_YEAR_MAX) errorMessage = "birthday выход за границы";
+
+        if (requestDto instanceof PlayerCreateRequestDto &&
+                (requestDto.getName() == null
+                || requestDto.getTitle() == null
+                || requestDto.getProfession() == null
+                || requestDto.getRace() == null
+                || requestDto.getBirthday() == null
+                || requestDto.getExperience() == null
+                )
+        ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "должны быть заданы все параметры");
+        }
+
+        if (requestDto instanceof PlayerCreateRequestDto && requestDto.getBanned() == null)  {
+            requestDto.setBanned(false);
+        }
+
+        if (requestDto.getName() != null && StringUtils.isEmpty(requestDto.getName())) errorMessage = "Имя должно быть не пустым";
+        if (requestDto.getName() != null && requestDto.getName().length() > NAME_LENGTH_MAX) errorMessage = "длина имени должна быть меньше " + NAME_LENGTH_MAX;
+        if (requestDto.getTitle() != null && requestDto.getTitle().length() > TITLE_LENGTH_MAX) errorMessage = "длина title должна быть меньше " + TITLE_LENGTH_MAX;
+        if (requestDto.getExperience() != null && (requestDto.getExperience() < 0 || requestDto.getExperience() > EXPERIENCE_MAX)) errorMessage = "Experience выход за границы";
+        if (requestDto.getBirthday() != null && (requestDto.getBirthday().getYear() + 1900 < BIRTHDAY_YEAR_MIN
+                    || requestDto.getBirthday().getYear() + 1900 > DEFAULT_YEAR_MAX)) errorMessage = "birthday выход за границы";
+
         if (! StringUtils.isEmpty(errorMessage)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
-
-        if (requestDto.getBanned() == null) requestDto.setBanned(false);
     };
 
     protected Pageable setSortAndFilters (PlayerRequestDto playerRequestDto) {
