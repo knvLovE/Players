@@ -109,7 +109,13 @@ public class PlayerDaoImpl implements PlayerDao{
         );
         if (count != 1) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        } else return getPlayerById(playerUpdate.getId());
+        }
+        Player player = getPlayerById(playerUpdate.getId());
+        // костылль
+//        if (playerUpdate.getBirthday() != null) {
+//            player.setBirthday(playerUpdate.getBirthday());
+//        }
+        return player;
     }
 
     protected Page<Player> readPlayersInfoByFilter (PlayerRequestDto playerRequestDto) {
