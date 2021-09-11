@@ -112,9 +112,9 @@ public class PlayerDaoImpl implements PlayerDao{
         }
         Player player = getPlayerById(playerUpdate.getId());
         // костылль
-//        if (playerUpdate.getBirthday() != null) {
-//            player.setBirthday(playerUpdate.getBirthday());
-//        }
+        if (playerUpdate.getBirthday() != null) {
+            player.setBirthday(playerUpdate.getBirthday());
+        }
         return player;
     }
 
